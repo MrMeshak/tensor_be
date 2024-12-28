@@ -9,6 +9,7 @@ import pureconfig.ConfigSource
 
 import com.tensor.config.ServerConfig
 import com.tensor.config.syntax.*
+import com.tensor.app.AppRoutes
 
 object Main extends IOApp.Simple {
   override def run: IO[Unit] = {
@@ -22,6 +23,7 @@ object Main extends IOApp.Simple {
           .default[IO]
           .withHost(serverConfig.host)
           .withPort(serverConfig.port)
+          .withHttpApp(AppRoutes[IO].routes.orNotFound)
           .build
           .use(_ => IO.println("tensor_be server running") *> IO.never)
       })
