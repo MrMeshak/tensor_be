@@ -13,5 +13,6 @@ lazy val root = project
       "org.http4s" %% "http4s-ember-server" % http4sVersion,
       "org.http4s" %% "http4s-dsl" % http4sVersion,
       "org.typelevel" %% "log4cats-slf4j" % "2.7.0",
+      "com.github.pureconfig" %% "pureconfig-core" % "0.17.8",
     ),
   )
