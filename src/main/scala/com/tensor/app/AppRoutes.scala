@@ -7,8 +7,9 @@ import org.http4s.dsl.impl.*
 import org.http4s.server.*
 
 import com.tensor.app.{HealthRoutes}
+import org.typelevel.log4cats.LoggerFactory
 
-class AppRoutes[F[_]: Concurrent] {
+class AppRoutes[F[_]: Concurrent: LoggerFactory] {
   private val healthRoutes = HealthRoutes[F].routes
 
   val routes: HttpRoutes[F] = Router(
@@ -17,5 +18,5 @@ class AppRoutes[F[_]: Concurrent] {
 }
 
 object AppRoutes {
-  def apply[F[_]: Concurrent] = new AppRoutes[F]
+  def apply[F[_]: Concurrent: LoggerFactory] = new AppRoutes[F]
 }

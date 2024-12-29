@@ -27,6 +27,5 @@ object Main extends IOApp.Simple {
           .build
           .use(_ => IO.println("tensor_be server running") *> IO.never)
       })
-
   }
 }
