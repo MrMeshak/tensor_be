@@ -16,24 +16,26 @@ import cats.syntax.*
 import org.typelevel.log4cats.*
 import org.typelevel.log4cats.LoggerFactory
 
+import com.tensor.validation.syntax.HttpValidationDsl
 import com.tensor.logging.syntax.*
 import com.tensor.algebra.AuthAlgebra
 import com.tensor.algebra.{LoginDto, SignupDto}
+import com.tensor.validation.authValidators.given
 
-class AuthRoutes[F[_]: Concurrent: LoggerFactory](authAlgebra: AuthAlgebra[F])
-    extends Http4sDsl[F] {
+class AuthRoutes[F[_]: Concurrent: LoggerFactory](authAlgebra: AuthAlgebra[F]) extends HttpValidationDsl[F] {
   private val signupRoute: HttpRoutes[F] = HttpRoutes.of[F]({ case req @ POST -> Root / "signup" =>
     for {
-      signupPayload <- req.as[SignupDto]
-      resp <- Ok(signupPayload.asJson)
+      signupDto <- req.as[SignupDto]
+      resp <- Ok(signupDto.asJson)
     } yield resp
   })
 
   private val loginRoute: HttpRoutes[F] = HttpRoutes.of[F]({ case req @ POST -> Root / "login" =>
-    for {
-      loginPayload <- req.as[LoginDto]
-      resp <- Ok(loginPayload.asJson)
-    } yield resp
+    req.validate[LoginDto](loginDto => {
+      for {
+        resp <- Ok(loginDto.asJson)
+      } yield resp
+    })
   })
 
   val routes = Router(
@@ -42,6 +44,5 @@ class AuthRoutes[F[_]: Concurrent: LoggerFactory](authAlgebra: AuthAlgebra[F])
 }
 
 object AuthRoutes {
-  def apply[F[_]: Concurrent: LoggerFactory](authAlgebra: AuthAlgebra[F]) =
-    new AuthRoutes[F](authAlgebra)
+  def apply[F[_]: Concurrent: LoggerFactory](authAlgebra: AuthAlgebra[F]) = new AuthRoutes[F](authAlgebra)
 }
